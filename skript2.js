@@ -18,19 +18,19 @@ document.addEventListener("DOMContentLoaded", function () {
         let value6 = parseFloat(num6.value); 
         let sum = value1 + value2 + value3 + value4 + value5 + value6 ;
         
-        if (sum === 10.75) {
-            console.log("Сумма равна '10' =", sum);
+        if (sum === 100) {
+            console.log("Сумма равна '100' =", sum);
         } else if (sum < 10.75) {
-            console.log("Сумма меньше '10' =", sum);
+            console.log("Сумма меньше '100' =", sum);
         } else {
-            console.log("Сумма больше '10' =", sum);
+            console.log("Сумма больше '100' =", sum);
         }
-        if (sum === 10.75) {
-            results1.innerHTML= "<strong>Сумма равна '10' =" + sum + "</strong>";
-        } else if (sum < 10.75) {
-            results1.innerHTML = "<strong>Сумма меньше '10' =" + sum + "</strong>";
+        if (sum === 100) {
+            results1.innerHTML= "<strong>Сумма равна '100' =" + sum + "</strong>";
+        } else if (sum < 100) {
+            results1.innerHTML = "<strong>Сумма меньше '100' =" + sum + "</strong>";
         } else {
-            results1.innerHTML = "<strong>Сумма больше '10' =" + sum + "</strong>";
+            results1.innerHTML = "<strong>Сумма больше '100' =" + sum + "</strong>";
         }
         result.innerHTML = "<strong>Сумма: " + sum + "</strong>";
         console.log("Сумма:", sum);
