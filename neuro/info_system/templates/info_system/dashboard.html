@@ -1,0 +1,165 @@
+{% extends 'info_system/base.html' %}
+{% block title %}Панель управления{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Пациенты</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Пол</th>
+            <th>Возраст</th>
+            <th>Телефон</th>
+            <th>Email</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patient in patients %}
+        <tr>
+            <td>{{ patient.last_name }} {{ patient.first_name }}</td>
+            <td>{{ patient.get_gender_display }}</td>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.phone }}</td>
+            <td>{{ patient.email }}</td>
+            <td>
+                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#patientModal{{ patient.id }}">Профиль</button>
+
+                <div class="modal fade" id="patientModal{{ patient.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Профиль пациента: {{ patient }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Пол:</strong> {{ patient.get_gender_display }}</p>
+                                <p><strong>Возраст:</strong> {{ patient.age }}</p>
+                                <p><strong>Телефон:</strong> {{ patient.phone }}</p>
+                                <p><strong>Email:</strong> {{ patient.email }}</p>
+                                <hr>
+                                <h6>Записи реабилитации:</h6>
+                                <ul>
+                                    {% for record in rehab_records %}
+                                        {% if record.patient == patient %}
+                                            <li>
+                                                {{ record.diagnosis }} | {{ record.rehab_start }} —
+                                                {% if record.rehab_end %}{{ record.rehab_end }}{% else %}по наст. время{% endif %}
+                                                {% if record.has_complications %} <span class="text-danger">(осложнения)</span>{% endif %}
+                                            </li>
+                                        {% endif %}
+                                    {% empty %}
+                                        <li>Нет записей</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Форма добавления пациента -->
+<div class="card mt-5">
+    <div class="card-header">
+        <h5 class="mb-0" data-bs-toggle="collapse" href="#addPatientForm" role="button" aria-expanded="false" aria-controls="addPatientForm">Добавить пациента</h5>
+    </div>
+    <div class="collapse" id="addPatientForm">
+        <div class="card-body">
+            <form method="post" action="{% url 'add_patient' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_first_name" class="form-label">Имя</label>
+                    {{ PatientForm.first_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_last_name" class="form-label">Фамилия</label>
+                    {{ PatientForm.last_name }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_gender" class="form-label">Пол</label>
+                    {{ PatientForm.gender }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_age" class="form-label">Дата рождения</label>
+                    {{ PatientForm.birth_date }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_phone" class="form-label">Телефон</label>
+                    {{ PatientForm.phone }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">Email</label>
+                    {{ PatientForm.email }}
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Форма добавления диагноза -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0" data-bs-toggle="collapse" href="#addDiagnosisForm" role="button" aria-expanded="false" aria-controls="addDiagnosisForm">Добавить диагноз</h5>
+    </div>
+    <div class="collapse" id="addDiagnosisForm">
+        <div class="card-body">
+            <form method="post" action="{% url 'add_diagnosis' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_diagnosis" class="form-label">Диагноз</label>
+                    {{ DiagnosisForm.diagnosis.errors }}
+                    {{ DiagnosisForm }}  <!-- Поле для ввода диагноза -->
+                </div>
+                <button type="submit" class="btn btn-secondary">Добавить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Форма добавления записи реабилитации -->
+<div class="card mt-4 mb-5">
+    <div class="card-header">
+        <h5 class="mb-0" data-bs-toggle="collapse" href="#addRehabilitationForm" role="button" aria-expanded="false" aria-controls="addRehabilitationForm">Добавить запись реабилитации</h5>
+    </div>
+    <div class="collapse" id="addRehabilitationForm">
+        <div class="card-body">
+            <form method="post" action="{% url 'add_rehabilitation_record' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_diagnosis" class="form-label">Диагноз</label>
+                    {{ RehabilitationRecordForm.diagnosis }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_patient" class="form-label">Пациент</label>
+                    {{ RehabilitationRecordForm.patient }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_rehab_start" class="form-label">Дата начала реабилитации</label>
+                    {{ RehabilitationRecordForm.rehab_start }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_rehab_end" class="form-label">Дата окончания реабилитации</label>
+                    {{ RehabilitationRecordForm.rehab_end }}
+                </div>
+                <div class="mb-3">
+                    <label for="id_has_complications" class="form-label">Есть ли осложнения?</label>
+                    {{ RehabilitationRecordForm.has_complications }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_note" class="form-label">Дополнительные сведения</label>
+                    {{ RehabilitationRecordForm.complication_details }}
+                </div>
+                <button type="submit" class="btn btn-success">Добавить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
